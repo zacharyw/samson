@@ -259,11 +259,12 @@ describe Build do
       before { build.external_id = '123' }
 
       it "is active when not finished" do
+        build.external_status = 'running'
         assert build.active?
       end
 
       it "is active when finished" do
-        build.docker_repo_digest = 'some-digest'
+        build.external_status = 'succeeded'
         refute build.active?
       end
     end

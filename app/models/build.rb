@@ -75,7 +75,7 @@ class Build < ActiveRecord::Base
   end
 
   def active?
-    external_id? ? !docker_repo_digest? : docker_build_job&.active?
+    external_id? ? Job::ACTIVE_STATUSES.include?(external_status) : docker_build_job&.active?
   end
 
   private
