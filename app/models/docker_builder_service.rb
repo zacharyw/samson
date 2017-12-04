@@ -12,7 +12,7 @@ class DockerBuilderService
   class << self
     # TODO: extract to basic docker builder so that swapping it out is easier
     def build_docker_image(dir, output, dockerfile:, tag: nil, cache_from: nil)
-      local_docker_login do |login_commands|
+      # local_docker_login do |login_commands|
         tag = " -t #{tag.shellescape}" if tag
         file = " -f #{dockerfile.shellescape}"
         executor = TerminalExecutor.new(output)
@@ -26,13 +26,13 @@ class DockerBuilderService
 
         return unless executor.execute(
           "cd #{dir.shellescape}",
-          *login_commands,
+          # *login_commands,
           *pull_cache,
           executor.verbose_command(build)
         )
         image_id = output.to_s.scan(/Successfully built (\S+)/).last&.first
         Docker::Image.get(image_id) if image_id
-      end
+      # end
     end
 
     private
