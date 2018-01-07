@@ -313,6 +313,11 @@ module Kubernetes
         [[:spec, :replicas], [:spec, :template, :spec, :containers]].each do |keys|
           update.dig_set keys, @template.dig_fetch(*keys)
         end
+
+        # we need to re-create pods on each deploy so deploy_executor can find them by release-id-label
+        annotations = (@template.dig(:spec, :template, :spec, :containers, 0)[:annotations] ||= {})
+        annotations["samson/force-restart"] = rand.to_s
+
         with_patch_header do
           request :patch, name, [{op: "replace", path: "/spec", value: update.fetch(:spec)}], namespace
         end
