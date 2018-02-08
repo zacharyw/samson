@@ -44,24 +44,14 @@ describe Samson::BuildFinder do
       out.wont_include "Creating Build"
     end
 
-    it "succeeds without a build when there is no Dockerfile" do
+    it "fails to build when dockerfile is missing" do
       Build.delete_all
+      job.project.update_column :dockerfiles, 'Dockerfile'
       GitRepository.any_instance.expects(:file_content).with('Dockerfile', job.commit).returns nil
 
       refute_difference 'Build.count' do
-        execute.must_equal [] # no build found or created
-        out.must_include "Not creating build"
-      end
-    end
-
-    it "fails to build when custom dockerfile is missing" do
-      Build.delete_all
-      job.project.update_column :dockerfiles, 'Foobarfile'
-      GitRepository.any_instance.expects(:file_content).with('Foobarfile', job.commit).returns nil
-
-      refute_difference 'Build.count' do
         e = assert_raises(Samson::Hooks::UserError) { execute }
-        e.message.must_include "Could not create build for Foobarfile"
+        e.message.must_include "Could not create build for Dockerfile"
       end
     end
 

@@ -141,9 +141,6 @@ module Samson
         )
         DockerBuilderService.new(Build.find(build.id)).run # .find to not update/reload the same object
         build
-      elsif dockerfile == "Dockerfile" # allowing us to deploy kubernetes without Dockerfile
-        @output.puts("Not creating #{name} since is is not in the repository.")
-        nil
       else
         raise(
           Samson::Hooks::UserError,
